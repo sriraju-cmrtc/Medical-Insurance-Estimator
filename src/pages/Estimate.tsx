@@ -95,99 +95,126 @@ const Estimate = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle>Insurance Cost Estimator</CardTitle>
-          <CardDescription>Enter your details to get an instant estimate</CardDescription>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold mb-2">Insurance Cost Estimator</h1>
+        <p className="text-muted-foreground text-lg">Enter your details below to get an instant personalized estimate</p>
+      </div>
+
+      <Card className="card-elevated border-2 border-blue-100 dark:border-blue-900/30">
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 rounded-t-lg">
+          <CardTitle className="text-2xl">Personal & Health Information</CardTitle>
+          <CardDescription>All information is processed locally on your device</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-8">
           {/* Personal Info */}
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="age">Age</Label>
-              <Input
-                id="age"
-                type="number"
-                value={inputs.age}
-                onChange={(e) => setInputs({ ...inputs, age: parseInt(e.target.value) || 0 })}
-                min="0"
-                max="120"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="sex">Sex</Label>
-              <Select value={inputs.sex} onValueChange={(value: any) => setInputs({ ...inputs, sex: value })}>
-                <SelectTrigger id="sex">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="bmi">BMI</Label>
-              <Input
-                id="bmi"
-                type="number"
-                step="0.1"
-                value={inputs.bmi}
-                onChange={(e) => setInputs({ ...inputs, bmi: parseFloat(e.target.value) || 0 })}
-                min="10"
-                max="50"
-              />
-            </div>
-          </div>
-
-          {/* Additional Info */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="children">Number of Children</Label>
-              <Input
-                id="children"
-                type="number"
-                value={inputs.children}
-                onChange={(e) => setInputs({ ...inputs, children: parseInt(e.target.value) || 0 })}
-                min="0"
-                max="10"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
-              <Select value={inputs.location} onValueChange={(value: any) => setInputs({ ...inputs, location: value })}>
-                <SelectTrigger id="location">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="metro">Metro City</SelectItem>
-                  <SelectItem value="urban">Urban</SelectItem>
-                  <SelectItem value="rural">Rural</SelectItem>
-                </SelectContent>
-              </Select>
+          <div>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">1</div>
+              Basic Information
+            </h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="age" className="font-semibold">Age</Label>
+                <Input
+                  id="age"
+                  type="number"
+                  value={inputs.age}
+                  onChange={(e) => setInputs({ ...inputs, age: parseInt(e.target.value) || 0 })}
+                  min="0"
+                  max="120"
+                  className="input-focus"
+                  placeholder="Enter your age"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="sex" className="font-semibold">Sex</Label>
+                <Select value={inputs.sex} onValueChange={(value: any) => setInputs({ ...inputs, sex: value })}>
+                  <SelectTrigger id="sex" className="input-focus">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="bmi" className="font-semibold">BMI</Label>
+                <Input
+                  id="bmi"
+                  type="number"
+                  step="0.1"
+                  value={inputs.bmi}
+                  onChange={(e) => setInputs({ ...inputs, bmi: parseFloat(e.target.value) || 0 })}
+                  min="10"
+                  max="50"
+                  className="input-focus"
+                  placeholder="Enter your BMI"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Smoker */}
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="smoker"
-              checked={inputs.smoker}
-              onCheckedChange={(checked) => setInputs({ ...inputs, smoker: checked as boolean })}
-            />
-            <Label htmlFor="smoker" className="cursor-pointer">I am a smoker</Label>
+          {/* Lifestyle & Family */}
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">2</div>
+              Lifestyle & Family
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="children" className="font-semibold">Number of Children</Label>
+                <Input
+                  id="children"
+                  type="number"
+                  value={inputs.children}
+                  onChange={(e) => setInputs({ ...inputs, children: parseInt(e.target.value) || 0 })}
+                  min="0"
+                  max="10"
+                  className="input-focus"
+                  placeholder="0"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="location" className="font-semibold">Location</Label>
+                <Select value={inputs.location} onValueChange={(value: any) => setInputs({ ...inputs, location: value })}>
+                  <SelectTrigger id="location" className="input-focus">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="metro">Metro City</SelectItem>
+                    <SelectItem value="urban">Urban</SelectItem>
+                    <SelectItem value="rural">Rural</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 mt-4 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-900/30">
+              <Checkbox
+                id="smoker"
+                checked={inputs.smoker}
+                onCheckedChange={(checked) => setInputs({ ...inputs, smoker: checked as boolean })}
+                className="w-5 h-5"
+              />
+              <Label htmlFor="smoker" className="cursor-pointer font-semibold text-base">I am a smoker</Label>
+            </div>
           </div>
 
           {/* Medical Conditions */}
-          <div className="space-y-2">
-            <Label>Medical Conditions</Label>
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">3</div>
+              Medical Conditions
+            </h3>
             <div className="grid md:grid-cols-3 gap-3">
               {MEDICAL_CONDITIONS.map((condition) => (
-                <div key={condition} className="flex items-center space-x-2">
+                <div key={condition} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                   <Checkbox
                     id={condition}
                     checked={inputs.medicalConditions.includes(condition)}
@@ -198,59 +225,69 @@ const Estimate = () => {
                         setInputs({ ...inputs, medicalConditions: inputs.medicalConditions.filter(c => c !== condition) });
                       }
                     }}
+                    className="w-5 h-5"
                   />
-                  <Label htmlFor={condition} className="cursor-pointer text-sm">{condition}</Label>
+                  <Label htmlFor={condition} className="cursor-pointer font-medium">{condition}</Label>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Treatment Details */}
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="accident">Accident Severity</Label>
-              <Select value={inputs.accidentSeverity} onValueChange={(value: any) => setInputs({ ...inputs, accidentSeverity: value })}>
-                <SelectTrigger id="accident">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  <SelectItem value="minor">Minor</SelectItem>
-                  <SelectItem value="moderate">Moderate</SelectItem>
-                  <SelectItem value="severe">Severe</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="hospitalization">Hospitalization Days</Label>
-              <Input
-                id="hospitalization"
-                type="number"
-                value={inputs.hospitalizationDays}
-                onChange={(e) => setInputs({ ...inputs, hospitalizationDays: parseInt(e.target.value) || 0 })}
-                min="0"
-                max="365"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="treatment">Treatment Type</Label>
-              <Select value={inputs.treatmentType} onValueChange={(value: any) => setInputs({ ...inputs, treatmentType: value })}>
-                <SelectTrigger id="treatment">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="outpatient">Outpatient</SelectItem>
-                  <SelectItem value="surgery">Surgery</SelectItem>
-                  <SelectItem value="icu">ICU</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">4</div>
+              Treatment Details
+            </h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="accident" className="font-semibold">Accident Severity</Label>
+                <Select value={inputs.accidentSeverity} onValueChange={(value: any) => setInputs({ ...inputs, accidentSeverity: value })}>
+                  <SelectTrigger id="accident" className="input-focus">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="minor">Minor</SelectItem>
+                    <SelectItem value="moderate">Moderate</SelectItem>
+                    <SelectItem value="severe">Severe</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="hospitalization" className="font-semibold">Hospitalization Days</Label>
+                <Input
+                  id="hospitalization"
+                  type="number"
+                  value={inputs.hospitalizationDays}
+                  onChange={(e) => setInputs({ ...inputs, hospitalizationDays: parseInt(e.target.value) || 0 })}
+                  min="0"
+                  max="365"
+                  className="input-focus"
+                  placeholder="0"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="treatment" className="font-semibold">Treatment Type</Label>
+                <Select value={inputs.treatmentType} onValueChange={(value: any) => setInputs({ ...inputs, treatmentType: value })}>
+                  <SelectTrigger id="treatment" className="input-focus">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="outpatient">Outpatient</SelectItem>
+                    <SelectItem value="surgery">Surgery</SelectItem>
+                    <SelectItem value="icu">ICU</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
-          <div className="flex gap-3">
-            <Button onClick={handleCalculate} className="flex-1" size="lg">
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
+            <Button onClick={handleCalculate} className="btn-gradient flex-1" size="lg">
               <Calculator className="mr-2 h-5 w-5" />
               Calculate Estimate
             </Button>
@@ -264,81 +301,91 @@ const Estimate = () => {
 
       {/* Results */}
       {result && (
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle>Estimate Results</CardTitle>
-            <CardDescription>Based on your inputs</CardDescription>
+        <Card className="card-elevated border-2 border-emerald-100 dark:border-emerald-900/30">
+          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-900 rounded-t-lg">
+            <CardTitle className="text-2xl">Your Estimate Results</CardTitle>
+            <CardDescription>Personalized insurance cost breakdown</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="text-center p-6 bg-primary/10 rounded-lg">
-              <p className="text-sm text-muted-foreground mb-2">Estimated Event Cost</p>
-              <p className="text-4xl font-bold text-primary">{formatINR(result.eventCost)}</p>
+          <CardContent className="space-y-8 pt-8">
+            <div className="text-center p-8 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-xl border-2 border-emerald-200 dark:border-emerald-900/50">
+              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300 mb-3">ESTIMATED EVENT COST</p>
+              <p className="text-5xl font-bold text-emerald-700 dark:text-emerald-400">{formatINR(result.eventCost)}</p>
             </div>
 
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Plan</TableHead>
-                  <TableHead>Annual Premium</TableHead>
-                  <TableHead>Expected Payout</TableHead>
-                  <TableHead>Deductible</TableHead>
-                  <TableHead>Coverage Cap</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {result.plans.map((plan) => (
-                  <TableRow key={plan.name}>
-                    <TableCell className="font-medium">{plan.name}</TableCell>
-                    <TableCell>{formatINR(plan.annualPremium)}</TableCell>
-                    <TableCell>{formatINR(plan.expectedPayout)}</TableCell>
-                    <TableCell>{formatINR(plan.deductible)}</TableCell>
-                    <TableCell>{formatINR(plan.coverageCap)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Insurance Plans Comparison</h3>
+              <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
+                <Table>
+                  <TableHeader className="bg-slate-50 dark:bg-slate-800">
+                    <TableRow className="border-b border-slate-200 dark:border-slate-700">
+                      <TableHead className="font-semibold">Plan</TableHead>
+                      <TableHead className="font-semibold">Annual Premium</TableHead>
+                      <TableHead className="font-semibold">Expected Payout</TableHead>
+                      <TableHead className="font-semibold">Deductible</TableHead>
+                      <TableHead className="font-semibold">Coverage Cap</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {result.plans.map((plan, idx) => (
+                      <TableRow key={plan.name} className={idx % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-slate-50 dark:bg-slate-800/50'}>
+                        <TableCell className="font-semibold text-primary">{plan.name}</TableCell>
+                        <TableCell className="font-medium">{formatINR(plan.annualPremium)}</TableCell>
+                        <TableCell className="text-emerald-600 dark:text-emerald-400 font-medium">{formatINR(plan.expectedPayout)}</TableCell>
+                        <TableCell className="text-orange-600 dark:text-orange-400 font-medium">{formatINR(plan.deductible)}</TableCell>
+                        <TableCell className="font-medium">{formatINR(plan.coverageCap)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* History */}
       {history.length > 0 && (
-        <Card className="glass-card">
-          <CardHeader>
+        <Card className="card-elevated border-2 border-blue-100 dark:border-blue-900/30">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 rounded-t-lg">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Saved Estimates</CardTitle>
-                <CardDescription>{history.length} estimate(s) in history</CardDescription>
+                <CardTitle className="text-2xl">Saved Estimates History</CardTitle>
+                <CardDescription>{history.length} estimate(s) saved</CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleExport}>
+                <Button variant="outline" size="sm" onClick={handleExport} className="font-semibold">
                   <Download className="mr-2 h-4 w-4" />
                   Export CSV
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleClearHistory}>
+                <Button variant="outline" size="sm" onClick={handleClearHistory} className="font-semibold">
                   <Trash2 className="mr-2 h-4 w-4" />
                   Clear
                 </Button>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
+          <CardContent className="pt-6">
+            <div className="space-y-3">
               {history.slice(0, 5).map((item, index) => (
-                <div key={item.timestamp} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">{formatINR(item.eventCost)}</p>
+                <div key={item.timestamp} className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800/50 dark:to-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+                  <div className="space-y-1 flex-1">
+                    <p className="text-lg font-bold text-primary">{formatINR(item.eventCost)}</p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(item.timestamp).toLocaleString('en-IN')} • 
-                      Age {item.inputs.age} • {item.inputs.treatmentType}
+                      {new Date(item.timestamp).toLocaleString('en-IN')} • Age {item.inputs.age} • {item.inputs.treatmentType}
                     </p>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => handleRestore(item)}>
-                    <RotateCcw className="h-4 w-4" />
+                  <Button variant="ghost" size="sm" onClick={() => handleRestore(item)} className="ml-auto">
+                    <RotateCcw className="h-4 w-4 mr-1" />
+                    Restore
                   </Button>
                 </div>
               ))}
             </div>
+            {history.length > 5 && (
+              <p className="text-sm text-muted-foreground mt-4 text-center">
+                Showing 5 of {history.length} estimates. Export to CSV to see all.
+              </p>
+            )}
           </CardContent>
         </Card>
       )}
