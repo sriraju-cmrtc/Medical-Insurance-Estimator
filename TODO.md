@@ -1,0 +1,22 @@
+- [ ] Update VoiceRecognition to accept language parameter
+- [ ] Add language selection in VoiceAssistant UI
+- [ ] Parse commands only on final results, not interim
+- [ ] Update isListening state properly in recognition events
+- [ ] Enhance parseCommands function for better parameter recognition
+- [ ] Test the voice assistant functionality
+=======
+- [x] Fix useEffect dependency in VoiceAssistant.tsx to prevent re-initialization
+- [x] Update VoiceRecognition to accept language parameter
+- [x] Add language selection in VoiceAssistant UI
+- [x] Parse commands only on final results, not interim
+- [x] Update isListening state properly in recognition events
+- [x] Enhance parseCommands function for better parameter recognition
+- [x] Add support for all major Indian languages (Hindi, Bengali, Telugu, Marathi, Tamil, Gujarati, Urdu, Kannada, Odia, Malayalam, Punjabi, Assamese)
+- [x] Add multi-language result reading (voice assistant now speaks results in selected language)
+- [x] Add voice command recognition for "read result" in all supported languages
+- [x] Add "Clear Parameters" button and functionality to Estimate page
+- [x] Add "Export CSV" functionality to Estimate page (already existed)
+- [x] Add voice command recognition for "clear parameters" in all supported languages
+- [x] Add voice command recognition for "export CSV" in all supported languages
+- [x] Add Clear Parameters and Export CSV buttons to Voice Assistant UI
+- [x] Test the voice assistant functionality
