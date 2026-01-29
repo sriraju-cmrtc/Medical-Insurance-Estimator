@@ -6,16 +6,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Calculator, Download, Trash2, RotateCcw } from 'lucide-react';
+import { Calculator, Download, Trash2, RotateCcw, Zap } from 'lucide-react';
 import { EstimateInputs, EstimateResult } from '@/types/insurance';
 import { calculateInsuranceCost, formatINR } from '@/lib/estimator';
 import { saveEstimate, getHistory, clearHistory, exportToCSV } from '@/lib/storage';
 import { useToast } from '@/hooks/use-toast';
+import { useMLInsights } from '@/hooks/use-ml-insights';
+import { RiskAssessmentCard, PlanRecommendationsCard, AnomalyDetectionCard, TrendAnalysisCard } from '@/components/MLInsightCards';
 
 const MEDICAL_CONDITIONS = ['Diabetes', 'Hypertension', 'Heart Disease', 'Asthma', 'Arthritis'];
 
 const Estimate = () => {
   const { toast } = useToast();
+  const { insights, generateInsights, retrainModel } = useMLInsights();
   const [inputs, setInputs] = useState<EstimateInputs>({
     age: 30,
     sex: 'male',
@@ -41,6 +44,12 @@ const Estimate = () => {
     setResult(calculatedResult);
     saveEstimate(calculatedResult);
     setHistory(getHistory());
+    
+    // Generate ML insights
+    generateInsights(calculatedResult);
+    
+    // Retrain model with new data
+    retrainModel();
     
     toast({
       title: "Estimate Calculated",
@@ -301,46 +310,108 @@ const Estimate = () => {
 
       {/* Results */}
       {result && (
-        <Card className="card-elevated border-2 border-emerald-100 dark:border-emerald-900/30">
-          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-900 rounded-t-lg">
-            <CardTitle className="text-2xl">Your Estimate Results</CardTitle>
-            <CardDescription>Personalized insurance cost breakdown</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-8 pt-8">
-            <div className="text-center p-8 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-xl border-2 border-emerald-200 dark:border-emerald-900/50">
-              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300 mb-3">ESTIMATED EVENT COST</p>
-              <p className="text-5xl font-bold text-emerald-700 dark:text-emerald-400">{formatINR(result.eventCost)}</p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Insurance Plans Comparison</h3>
-              <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
-                <Table>
-                  <TableHeader className="bg-slate-50 dark:bg-slate-800">
-                    <TableRow className="border-b border-slate-200 dark:border-slate-700">
-                      <TableHead className="font-semibold">Plan</TableHead>
-                      <TableHead className="font-semibold">Annual Premium</TableHead>
-                      <TableHead className="font-semibold">Expected Payout</TableHead>
-                      <TableHead className="font-semibold">Deductible</TableHead>
-                      <TableHead className="font-semibold">Coverage Cap</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {result.plans.map((plan, idx) => (
-                      <TableRow key={plan.name} className={idx % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-slate-50 dark:bg-slate-800/50'}>
-                        <TableCell className="font-semibold text-primary">{plan.name}</TableCell>
-                        <TableCell className="font-medium">{formatINR(plan.annualPremium)}</TableCell>
-                        <TableCell className="text-emerald-600 dark:text-emerald-400 font-medium">{formatINR(plan.expectedPayout)}</TableCell>
-                        <TableCell className="text-orange-600 dark:text-orange-400 font-medium">{formatINR(plan.deductible)}</TableCell>
-                        <TableCell className="font-medium">{formatINR(plan.coverageCap)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+        <>
+          <Card className="card-elevated border-2 border-emerald-100 dark:border-emerald-900/30">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-900 rounded-t-lg">
+              <CardTitle className="text-2xl">Your Estimate Results</CardTitle>
+              <CardDescription>Personalized insurance cost breakdown</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8 pt-8">
+              <div className="text-center p-8 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-xl border-2 border-emerald-200 dark:border-emerald-900/50">
+                <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300 mb-3">ESTIMATED EVENT COST</p>
+                <p className="text-5xl font-bold text-emerald-700 dark:text-emerald-400">{formatINR(result.eventCost)}</p>
               </div>
+
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Insurance Plans Comparison</h3>
+                <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
+                  <Table>
+                    <TableHeader className="bg-slate-50 dark:bg-slate-800">
+                      <TableRow className="border-b border-slate-200 dark:border-slate-700">
+                        <TableHead className="font-semibold">Plan</TableHead>
+                        <TableHead className="font-semibold">Annual Premium</TableHead>
+                        <TableHead className="font-semibold">Expected Payout</TableHead>
+                        <TableHead className="font-semibold">Deductible</TableHead>
+                        <TableHead className="font-semibold">Coverage Cap</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {result.plans.map((plan, idx) => (
+                        <TableRow key={plan.name} className={idx % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-slate-50 dark:bg-slate-800/50'}>
+                          <TableCell className="font-semibold text-primary">{plan.name}</TableCell>
+                          <TableCell className="font-medium">{formatINR(plan.annualPremium)}</TableCell>
+                          <TableCell className="text-emerald-600 dark:text-emerald-400 font-medium">{formatINR(plan.expectedPayout)}</TableCell>
+                          <TableCell className="text-orange-600 dark:text-orange-400 font-medium">{formatINR(plan.deductible)}</TableCell>
+                          <TableCell className="font-medium">{formatINR(plan.coverageCap)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ML Insights Section */}
+          {insights.riskProfile && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Zap className="w-5 h-5 text-blue-500" />
+                <h2 className="text-3xl font-bold">ML-Powered Insights</h2>
+              </div>
+
+              {/* Risk Assessment */}
+              <RiskAssessmentCard riskProfile={insights.riskProfile} />
+
+              {/* Plan Recommendations */}
+              {insights.recommendations.length > 0 && (
+                <PlanRecommendationsCard recommendations={insights.recommendations} />
+              )}
+
+              {/* Anomaly Detection */}
+              <AnomalyDetectionCard anomaly={insights.anomalyDetection} />
+
+              {/* Trend Analysis */}
+              {insights.temporalAnalysis && (
+                <TrendAnalysisCard
+                  trend={insights.temporalAnalysis.trend}
+                  frequentFactors={insights.patterns?.commonPatterns.slice(0, 3).map((p: any) => p.pattern) || []}
+                />
+              )}
+
+              {/* Model Status */}
+              {insights.modelTrained && insights.modelMetrics && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-yellow-500" />
+                      Machine Learning Model Status
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+                        <p className="text-sm text-muted-foreground">Model Accuracy (MAPE)</p>
+                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                          {insights.modelMetrics.mape.toFixed(1)}%
+                        </p>
+                      </div>
+                      <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                        <p className="text-sm text-muted-foreground">Root Mean Squared Error (RMSE)</p>
+                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          ₹{(insights.modelMetrics.rmse / 1000).toFixed(1)}K
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      ✓ Model trained on {history.length} historical estimates. Predictions improve with more data.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
-          </CardContent>
-        </Card>
+          )}
+        </>
       )}
 
       {/* History */}
