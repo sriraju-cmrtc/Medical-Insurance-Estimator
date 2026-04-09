@@ -2,13 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Mic, Square, Play, Volume2, RotateCcw, Download } from 'lucide-react';
+import { Mic, Square, Play, Volume2, RotateCcw, Download, Zap } from 'lucide-react';
 import { EstimateInputs, EstimateResult } from '@/types/insurance';
 import { VoiceRecognition } from '@/lib/voiceRecognition';
 import { calculateInsuranceCost, formatINR } from '@/lib/estimator';
 import { getHistory, exportToCSV } from '@/lib/storage';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
+import { useMLInsights } from '@/hooks/use-ml-insights';
+import { RiskAssessmentCard, PlanRecommendationsCard, AnomalyDetectionCard, TrendAnalysisCard } from '@/components/MLInsightCards';
 
 const resultTranslations = {
   'en-US': {
@@ -274,6 +276,7 @@ const commandsData = {
 
 const VoiceAssistant = () => {
   const { toast } = useToast();
+  const { insights, generateInsights, retrainModel } = useMLInsights();
   const [status, setStatus] = useState('Ready');
   const [transcript, setTranscript] = useState('');
   const [isListening, setIsListening] = useState(false);
@@ -443,6 +446,13 @@ const VoiceAssistant = () => {
   const handleEstimate = () => {
     const calculatedResult = calculateInsuranceCost(inputs);
     setResult(calculatedResult);
+    
+    // Generate ML insights
+    generateInsights(calculatedResult);
+    
+    // Retrain model with new data
+    retrainModel();
+    
     toast({
       title: "Estimate Calculated",
       description: `Event cost: ${formatINR(calculatedResult.eventCost)}`
@@ -650,40 +660,103 @@ const VoiceAssistant = () => {
 
       {/* Results */}
       {result && (
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle>Voice Estimate Results</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="text-center p-6 bg-primary/10 rounded-lg">
-              <p className="text-sm text-muted-foreground mb-2">Estimated Event Cost</p>
-              <p className="text-4xl font-bold text-primary">{formatINR(result.eventCost)}</p>
-            </div>
+        <>
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle>Voice Estimate Results</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="text-center p-6 bg-primary/10 rounded-lg">
+                <p className="text-sm text-muted-foreground mb-2">Estimated Event Cost</p>
+                <p className="text-4xl font-bold text-primary">{formatINR(result.eventCost)}</p>
+              </div>
 
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Plan</TableHead>
-                  <TableHead>Annual Premium</TableHead>
-                  <TableHead>Expected Payout</TableHead>
-                  <TableHead>Deductible</TableHead>
-                  <TableHead>Coverage Cap</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {result.plans.map((plan) => (
-                  <TableRow key={plan.name}>
-                    <TableCell className="font-medium">{plan.name}</TableCell>
-                    <TableCell>{formatINR(plan.annualPremium)}</TableCell>
-                    <TableCell>{formatINR(plan.expectedPayout)}</TableCell>
-                    <TableCell>{formatINR(plan.deductible)}</TableCell>
-                    <TableCell>{formatINR(plan.coverageCap)}</TableCell>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Plan</TableHead>
+                    <TableHead>Annual Premium</TableHead>
+                    <TableHead>Expected Payout</TableHead>
+                    <TableHead>Deductible</TableHead>
+                    <TableHead>Coverage Cap</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                </TableHeader>
+                <TableBody>
+                  {result.plans.map((plan) => (
+                    <TableRow key={plan.name}>
+                      <TableCell className="font-medium">{plan.name}</TableCell>
+                      <TableCell>{formatINR(plan.annualPremium)}</TableCell>
+                      <TableCell>{formatINR(plan.expectedPayout)}</TableCell>
+                      <TableCell>{formatINR(plan.deductible)}</TableCell>
+                      <TableCell>{formatINR(plan.coverageCap)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* ML Insights Section */}
+          {insights.riskProfile && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Zap className="w-5 h-5 text-blue-500" />
+                <h2 className="text-3xl font-bold">ML-Powered Insights</h2>
+              </div>
+
+              {/* Risk Assessment */}
+              <RiskAssessmentCard riskProfile={insights.riskProfile} language={language} />
+
+              {/* Plan Recommendations */}
+              {insights.recommendations.length > 0 && (
+                <PlanRecommendationsCard recommendations={insights.recommendations} language={language} />
+              )}
+
+              {/* Anomaly Detection */}
+              <AnomalyDetectionCard anomaly={insights.anomalyDetection} language={language} />
+
+              {/* Trend Analysis */}
+              {insights.temporalAnalysis && (
+                <TrendAnalysisCard
+                  trend={insights.temporalAnalysis.trend}
+                  frequentFactors={insights.patterns?.commonPatterns.slice(0, 3).map((p: any) => p.pattern) || []}
+                  language={language}
+                />
+              )}
+
+              {/* Model Status */}
+              {insights.modelTrained && insights.modelMetrics && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-yellow-500" />
+                      Machine Learning Model Status
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+                        <p className="text-sm text-muted-foreground">Model Accuracy (MAPE)</p>
+                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                          {insights.modelMetrics.mape.toFixed(1)}%
+                        </p>
+                      </div>
+                      <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                        <p className="text-sm text-muted-foreground">Root Mean Squared Error (RMSE)</p>
+                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          ₹{(insights.modelMetrics.rmse / 1000).toFixed(1)}K
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      ✓ Model trained on {getHistory().length} historical estimates. Predictions improve with more data.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

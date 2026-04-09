@@ -19,6 +19,7 @@ const MEDICAL_CONDITIONS = ['Diabetes', 'Hypertension', 'Heart Disease', 'Asthma
 const Estimate = () => {
   const { toast } = useToast();
   const { insights, generateInsights, retrainModel } = useMLInsights();
+  const [language, setLanguage] = useState('en-US');
   const [inputs, setInputs] = useState<EstimateInputs>({
     age: 30,
     sex: 'male',
@@ -361,21 +362,22 @@ const Estimate = () => {
               </div>
 
               {/* Risk Assessment */}
-              <RiskAssessmentCard riskProfile={insights.riskProfile} />
+              <RiskAssessmentCard riskProfile={insights.riskProfile} language={language} />
 
               {/* Plan Recommendations */}
               {insights.recommendations.length > 0 && (
-                <PlanRecommendationsCard recommendations={insights.recommendations} />
+                <PlanRecommendationsCard recommendations={insights.recommendations} language={language} />
               )}
 
               {/* Anomaly Detection */}
-              <AnomalyDetectionCard anomaly={insights.anomalyDetection} />
+              <AnomalyDetectionCard anomaly={insights.anomalyDetection} language={language} />
 
               {/* Trend Analysis */}
               {insights.temporalAnalysis && (
                 <TrendAnalysisCard
                   trend={insights.temporalAnalysis.trend}
                   frequentFactors={insights.patterns?.commonPatterns.slice(0, 3).map((p: any) => p.pattern) || []}
+                  language={language}
                 />
               )}
 
